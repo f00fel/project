@@ -10,6 +10,7 @@ import json
 import re
 import hashlib
 import asyncio
+import aiohttp
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -18,7 +19,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 TOKEN = "8183275871:AAH13XOFrl7a9fe53mDFPEo9HfGju-V9VHw"
-OPENROUTER_API_KEY = "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"
+OPENROUTER_API_KEY = "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"
 SITE_URL = "https://t.me/GoodScan1_bot"
 SITE_NAME = "GoodScan"
 
@@ -151,7 +152,7 @@ class RussianBarcodeBot:
     async def analyze_with_qwen(self, product_info: dict) -> str:
         try:
             prompt = f"""
-                Ты — эксперт-аналитик продуктов . Ниже — данные, полученные из официального API Роскачества и  данные из интернета:
+                Ты — эксперт по качеству продуктов. Проанализируй товар на основе этих данных:
                 • Название: {product_info['name']}
                 • Производитель: {product_info['brand']}
                 • Регион: {product_info['country']}
@@ -162,7 +163,11 @@ class RussianBarcodeBot:
                 • Аллергены: {', '.join(product_info['allergens']) or 'не обнаружены'}
                 • Ссылка на отчёт: {product_info['link']}
 
-                Задача: дать краткую экспертную оценку качества и состава продукта, **обязательно** вставляя в текст явные ссылки на исходные данные (например: «Согласно рейтингу 4.5 из 5…», «Как указано на сайте Роскачества…» ид. Также выделяй в тексте важную информацию).
+                Задача:  
+                - Выдели 3 главных плюса и минуса.  
+                - Оцени опасность аллергенов (если есть).  
+                - Дай рекомендацию ("Рекомендую/Нет" и почему).  
+                Ответ на русском, 5-7 предложений, без технических терминов.
                 """
 
             headers = {
@@ -276,7 +281,6 @@ class RussianBarcodeBot:
 
 
 if __name__ == '__main__':
-    import aiohttp
 
     bot = RussianBarcodeBot()
     bot.run()
